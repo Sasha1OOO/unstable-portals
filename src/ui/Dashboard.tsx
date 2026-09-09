@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { ACTION_LABEL, canRun } from '../domain/actions';
 import type { ActionType, Portal } from '../domain/types';
 import { useLab } from '../state/store';
@@ -8,6 +8,7 @@ import { PortalHistory } from './PortalHistory';
 import { PortalTable } from './PortalTable';
 import { Resizable } from './Resizable';
 import { SummaryBar } from './SummaryBar';
+import { useDragValue } from './useDragValue';
 
 interface Toast {
   id: number;
@@ -22,6 +23,7 @@ interface Pending {
 }
 
 let toastSeq = 0;
+const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, n));
 
 export function Dashboard() {
   const { state, dispatch } = useLab();
@@ -32,6 +34,61 @@ export function Dashboard() {
   const selected = useMemo(
     () => state.portals.find((p) => p.id === selectedId) ?? null,
     [state.portals, selectedId],
+  );
+
+  // ── Резайз раскладки ────────────────────────────────────────────────
+  const gridRef = useRef<HTMLDivElement>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
+
+  const col = useDragValue('plab:col'); // ширина правой колонки
+  const rightH = useDragValue('plab:rightH'); // высота правой колонки (список тянется следом)
+  const split = useDragValue('plab:split'); // высота карточки внутри правой колонки
+
+  // одна и та же полоса: правый край списка и левый край карточки/истории
+  const startCol = useCallback(
+    (e: ReactPointerEvent) => {
+      const grid = gridRef.current;
+      const stack = stackRef.current;
+      if (!grid || !stack) return;
+      const gw = grid.clientWidth;
+      col.beginDrag({
+        axis: 'x',
+        start: stack.getBoundingClientRect().width,
+        compute: (start, dx) => clamp(start - dx, 340, gw - 340),
+      })(e);
+    },
+    [col],
+  );
+
+  // нижний край правой колонки — общая высота (список подстраивается)
+  const startRightH = useCallback(
+    (e: ReactPointerEvent) => {
+      const stack = stackRef.current;
+      if (!stack) return;
+      rightH.beginDrag({
+        axis: 'y',
+        start: stack.getBoundingClientRect().height,
+        compute: (start, dy) => clamp(start + dy, 320, 1800),
+      })(e);
+    },
+    [rightH],
+  );
+
+  // одна полоса между карточкой и историей — делит высоту между ними
+  const startSplit = useCallback(
+    (e: ReactPointerEvent) => {
+      const detail = detailRef.current;
+      const stack = stackRef.current;
+      if (!detail || !stack) return;
+      const maxDetail = stack.clientHeight - 140;
+      split.beginDrag({
+        axis: 'y',
+        start: detail.getBoundingClientRect().height,
+        compute: (start, dy) => clamp(start + dy, 140, Math.max(160, maxDetail)),
+      })(e);
+    },
+    [split],
   );
 
   const pushToast = useCallback((kind: Toast['kind'], text: string) => {
@@ -65,6 +122,8 @@ export function Dashboard() {
     setPending(null);
   }, [pending, dispatch, pushToast]);
 
+  const colTitle = 'Потяните, чтобы изменить ширину колонок. Двойной клик — сброс.';
+
   return (
     <>
       <div className="panel">
@@ -92,30 +151,71 @@ export function Dashboard() {
       <SummaryBar portals={state.portals} onPick={setSelectedId} />
 
       <p className="hint rz-tip">
-        Размер «окон» ниже можно менять: тяните за нижний край панели (у списка порталов — ещё и за
-        правый край или угол). Двойной клик по краю — сброс к размеру по умолчанию.
+        Раскладку можно перекраивать за полосы-разделители: между колонками — ширина; между карточкой
+        портала и историей — как поделить высоту; нижний край правой колонки — её общая высота (список
+        подстраивается); нижний край журнала — высота журнала. Двойной клик по полосе — сброс.
       </p>
 
-      <div className="grid">
-        <Resizable
-          className="rz-list"
-          handles={['e', 's', 'se']}
-          storageKey="list"
-          minWidth={320}
-          minHeight={220}
-        >
+      <div
+        className="grid"
+        ref={gridRef}
+        style={col.value != null ? { gridTemplateColumns: `minmax(320px, 1fr) ${col.value}px` } : undefined}
+      >
+        <div className="rz rz-list">
           <div className="panel">
             <h2>Порталы ({state.portals.length})</h2>
             <PortalTable portals={state.portals} selectedId={selectedId} onSelect={setSelectedId} />
           </div>
-        </Resizable>
-        <div className="stack">
-          <Resizable className="rz-detail" handles={['s']} storageKey="detail" minHeight={220}>
+          <span
+            className="col-grip col-grip-e"
+            onPointerDown={startCol}
+            onDoubleClick={col.reset}
+            title={colTitle}
+          />
+        </div>
+
+        <div
+          className="stack"
+          ref={stackRef}
+          style={rightH.value != null ? { height: rightH.value } : undefined}
+        >
+          <div
+            className="rz rz-detail"
+            ref={detailRef}
+            style={split.value != null ? { flex: `0 0 ${split.value}px` } : undefined}
+          >
             <PortalDetail portal={selected} onAttempt={attempt} />
-          </Resizable>
-          <Resizable className="rz-history" handles={['s']} storageKey="history" minHeight={140}>
+            <span
+              className="col-grip col-grip-w"
+              onPointerDown={startCol}
+              onDoubleClick={col.reset}
+              title={colTitle}
+            />
+          </div>
+
+          <span
+            className="rz-split"
+            onPointerDown={startSplit}
+            onDoubleClick={split.reset}
+            title="Потяните, чтобы поделить высоту между карточкой портала и историей. Двойной клик — сброс."
+          />
+
+          <div className="rz rz-history">
             <PortalHistory portal={selected} />
-          </Resizable>
+            <span
+              className="col-grip col-grip-w"
+              onPointerDown={startCol}
+              onDoubleClick={col.reset}
+              title={colTitle}
+            />
+          </div>
+
+          <span
+            className="rz-handle rz-s rz-stack-s"
+            onPointerDown={startRightH}
+            onDoubleClick={rightH.reset}
+            title="Потяните за нижний край, чтобы изменить высоту правой колонки. Двойной клик — сброс."
+          />
         </div>
       </div>
 

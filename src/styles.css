@@ -101,51 +101,77 @@ button.btn.guarded { border-color: var(--warn); color: var(--warn); }
 button.btn.danger { border-color: var(--danger); color: #fecdd3; }
 button.btn.small { padding: 4px 9px; font-size: 12px; }
 
-.grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; }
-.grid > .rz-list { flex: 1 1 560px; min-width: 320px; }
-.grid > .stack { flex: 1 1 380px; min-width: 340px; display: flex; flex-direction: column; gap: 16px; }
-/* левая колонка (список) по умолчанию фиксируется по высоте правой (карточка + история);
-   при большом числе порталов появляется прокрутка, а не рост высоты */
-.rz-list > .panel { display: flex; flex-direction: column; min-height: 0; }
+/* ── Раскладка рабочей области: две колонки, всё резайзится ─────────── */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(360px, 0.82fr);
+  gap: 16px;
+  align-items: stretch;
+  position: relative;
+}
 
-/* ── Резайз «окон» перетаскиванием рамок ───────────────────────────── */
 .rz { position: relative; min-width: 0; }
 .rz > .panel { height: 100%; box-sizing: border-box; }
-/* .rz-list без своей высоты — тянется по правой колонке (align-items: stretch),
-   пока пользователь не задаст высоту перетаскиванием нижнего края */
-.rz-history { height: 260px; }
-.rz-log { height: 340px; }
-/* карточка портала: при уменьшении высоты прокручивается внутри себя */
+
+/* левая колонка: тянется по высоте правой; много порталов → прокрутка, а не рост */
+.rz-list { display: flex; flex-direction: column; }
+.rz-list > .panel { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+
+/* правая колонка: карточка + полоса-разделитель + история, общая высота двигается */
+.stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 760px;
+  min-width: 0;
+}
+.rz-detail { flex: 0 0 58%; min-height: 0; }
 .rz-detail > .panel { overflow-y: auto; }
-.rz-tip { margin: 14px 0 6px; }
+.rz-history { flex: 1 1 0; min-height: 0; }
+.rz-history > .panel, .rz-log > .panel { display: flex; flex-direction: column; min-height: 0; }
+
+.rz-log { display: block; height: 340px; margin-top: 16px; }
+.rz-tip { margin: 14px 0 8px; }
+
 @media (max-width: 1024px) {
-  /* одна колонка: список получает свою высоту (не может тянуться по соседу) */
-  .grid > .rz-list { flex: 1 1 100% !important; width: auto !important; height: 460px !important; }
-  .grid > .stack { flex: 1 1 100%; }
+  .grid { grid-template-columns: 1fr !important; }
+  .stack { height: auto !important; }
+  .rz-detail { flex: none !important; }
+  .rz-detail > .panel { overflow-y: visible; }
+  .rz-history { flex: none !important; height: 240px; }
+  .rz-list { height: 460px !important; }
+  .col-grip, .rz-split, .rz-stack-s { display: none; }
 }
 
-.rz-handle { position: absolute; z-index: 4; touch-action: none; }
-.rz-e { top: 10px; bottom: 10px; right: -5px; width: 11px; cursor: ew-resize; }
-.rz-s { left: 10px; right: 10px; bottom: -5px; height: 11px; cursor: ns-resize; }
-.rz-se { right: -5px; bottom: -5px; width: 18px; height: 18px; cursor: nwse-resize; z-index: 5; }
-.rz-e::after {
-  content: ''; position: absolute; top: 0; bottom: 0; right: 4px; width: 3px;
-  border-radius: 2px; background: transparent; transition: background 0.12s;
+/* ── Полосы движения (резайз) ──────────────────────────────────────── */
+.rz-handle, .col-grip, .rz-split { touch-action: none; z-index: 6; }
+.rz-handle::after, .col-grip::after, .rz-split::after {
+  content: ''; position: absolute; border-radius: 2px;
+  background: rgba(148, 163, 184, 0.30); transition: background 0.12s;
 }
-.rz-s::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 4px; height: 3px;
-  border-radius: 2px; background: transparent; transition: background 0.12s;
-}
-.rz-e:hover::after, .rz-s:hover::after { background: var(--accent); }
-.rz-se::after {
-  content: ''; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px;
-  border-right: 2px solid var(--text-dim); border-bottom: 2px solid var(--text-dim);
-}
-.rz-se:hover::after { border-color: var(--accent); }
+.rz-handle:hover::after, .col-grip:hover::after, .rz-split:hover::after,
+body.rz-dragging .rz-handle::after, body.rz-dragging .col-grip::after,
+body.rz-dragging .rz-split::after { background: var(--accent); }
+
+/* нижний край панели / правой колонки */
+.rz-handle.rz-s, .rz-stack-s { position: absolute; left: 12px; right: 12px; bottom: -6px; height: 12px; cursor: ns-resize; }
+.rz-handle.rz-s::after, .rz-stack-s::after { left: 0; right: 0; bottom: 4px; height: 3px; }
+
+/* граница колонок: правый край списка и левый край карточки/истории — одно и то же */
+.col-grip { position: absolute; top: 12px; bottom: 12px; width: 14px; cursor: ew-resize; }
+.col-grip-e { right: -8px; }
+.col-grip-w { left: -8px; }
+.col-grip::after { top: 0; bottom: 0; width: 3px; }
+.col-grip-e::after { right: 5px; }
+.col-grip-w::after { left: 5px; }
+
+/* одна полоса между карточкой и историей — делит высоту */
+.rz-split { flex: 0 0 16px; position: relative; cursor: ns-resize; }
+.rz-split::after { left: 12px; right: 12px; top: 50%; transform: translateY(-50%); height: 3px; }
+
 body.rz-dragging { user-select: none; }
-body.rz-dragging .rz-e::after, body.rz-dragging .rz-s::after { background: var(--accent); }
 @media (prefers-reduced-motion: reduce) {
-  .rz-e::after, .rz-s::after { transition: none; }
+  .rz-handle::after, .col-grip::after, .rz-split::after { transition: none; }
 }
 
 .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
@@ -265,15 +291,11 @@ table.portals tbody tr.selected { background: #1d2740; outline: 1px solid var(--
 .scrollbox .history-item:last-child,
 .scrollbox .log-item:last-child { border-bottom: none; }
 .resize-y { resize: vertical; min-height: 110px; }
-/* история портала и журнал: наполняют свою (резайзящуюся рамкой) панель */
-.rz-history > .panel, .rz-log > .panel { display: flex; flex-direction: column; min-height: 0; }
+/* история портала и журнал: список наполняет свою панель и прокручивается */
 .history-box, .log-box { flex: 1 1 0; min-height: 0; }
-/* «внимание в первую очередь» остаётся с собственным резайзом за угол */
+/* «внимание в первую очередь» — с собственным резайзом за угол */
 .attention-box { height: 150px; margin: 0; padding-left: 34px; list-style-position: outside; }
 .attention-item { margin: 5px 0; }
-
-.stack { display: flex; flex-direction: column; gap: 16px; }
-.stack > .panel + .panel { margin-top: 0; }
 
 .empty { text-align: center; color: var(--text-dim); padding: 40px 20px; }
 .empty .big { font-size: 15px; color: var(--text); margin-bottom: 6px; }

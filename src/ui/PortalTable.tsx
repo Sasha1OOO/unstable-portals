@@ -21,8 +21,18 @@ export function PortalTable({
   }
 
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div className="portals-wrap">
       <table className="portals">
+        <colgroup>
+          <col className="c-name" />
+          <col className="c-world" />
+          <col className="c-energy" />
+          <col className="c-stab" />
+          <col className="c-time" />
+          <col className="c-crea" />
+          <col className="c-status" />
+          <col className="c-risk" />
+        </colgroup>
         <thead>
           <tr>
             <th>Портал</th>

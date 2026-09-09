@@ -18,7 +18,6 @@ export function App() {
     <div className="app">
       <header className="top">
         <h1>Лаборатория нестабильных порталов</h1>
-        <span className="sub">панель смотрителя · риск, действия, журнал</span>
         <nav className="tabs">
           {TABS.map((t) => (
             <button

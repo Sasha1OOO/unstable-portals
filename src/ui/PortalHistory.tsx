@@ -16,7 +16,7 @@ export function PortalHistory({ portal }: { portal: Portal | null }) {
       <h2>
         История изменений — {portal.name} ({portal.history.length})
       </h2>
-      <div className="scrollbox resize-y history-box">
+      <div className="scrollbox history-box">
         {portal.history.map((h) => (
           <div className="history-item" key={h.id}>
             <time>{fmtTime(h.at)}</time>
@@ -33,7 +33,6 @@ export function PortalHistory({ portal }: { portal: Portal | null }) {
           </div>
         ))}
       </div>
-      <p className="hint">Потяните за нижний край блока, чтобы изменить его высоту.</p>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export function EventLog({ log }: { log: LogEntry[] }) {
       {shown.length === 0 ? (
         <p className="hint">Событий нет.</p>
       ) : (
-        <div className="scrollbox resize-y log-box">
+        <div className="scrollbox log-box">
           {shown.map((e) => (
             <div className={`log-item ${e.kind}`} key={e.id}>
               <time>{fmtTime(e.at)}</time>
@@ -47,7 +47,6 @@ export function EventLog({ log }: { log: LogEntry[] }) {
           ))}
         </div>
       )}
-      <p className="hint">Потяните за нижний край журнала, чтобы изменить его высоту.</p>
     </div>
   );
 }

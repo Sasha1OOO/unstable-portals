@@ -6,6 +6,7 @@ import { EventLog } from './EventLog';
 import { PortalDetail } from './PortalDetail';
 import { PortalHistory } from './PortalHistory';
 import { PortalTable } from './PortalTable';
+import { Resizable } from './Resizable';
 import { SummaryBar } from './SummaryBar';
 
 interface Toast {
@@ -90,18 +91,37 @@ export function Dashboard() {
 
       <SummaryBar portals={state.portals} onPick={setSelectedId} />
 
+      <p className="hint rz-tip">
+        Размер «окон» ниже можно менять: тяните за нижний край панели (у списка порталов — ещё и за
+        правый край или угол). Двойной клик по краю — сброс к размеру по умолчанию.
+      </p>
+
       <div className="grid">
-        <div className="panel">
-          <h2>Порталы ({state.portals.length})</h2>
-          <PortalTable portals={state.portals} selectedId={selectedId} onSelect={setSelectedId} />
-        </div>
+        <Resizable
+          className="rz-list"
+          handles={['e', 's', 'se']}
+          storageKey="list"
+          minWidth={320}
+          minHeight={220}
+        >
+          <div className="panel">
+            <h2>Порталы ({state.portals.length})</h2>
+            <PortalTable portals={state.portals} selectedId={selectedId} onSelect={setSelectedId} />
+          </div>
+        </Resizable>
         <div className="stack">
-          <PortalDetail portal={selected} onAttempt={attempt} />
-          <PortalHistory portal={selected} />
+          <Resizable className="rz-detail" handles={['s']} storageKey="detail" minHeight={220}>
+            <PortalDetail portal={selected} onAttempt={attempt} />
+          </Resizable>
+          <Resizable className="rz-history" handles={['s']} storageKey="history" minHeight={140}>
+            <PortalHistory portal={selected} />
+          </Resizable>
         </div>
       </div>
 
-      <EventLog log={state.log} />
+      <Resizable className="rz-log" handles={['s']} storageKey="log" minHeight={140}>
+        <EventLog log={state.log} />
+      </Resizable>
 
       {toasts.length > 0 && (
         <div className="toasts">

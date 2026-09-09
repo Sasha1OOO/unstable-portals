@@ -101,11 +101,52 @@ button.btn.guarded { border-color: var(--warn); color: var(--warn); }
 button.btn.danger { border-color: var(--danger); color: #fecdd3; }
 button.btn.small { padding: 4px 9px; font-size: 12px; }
 
-.grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); gap: 16px; align-items: stretch; }
-@media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
-/* левая колонка (список) фиксируется по высоте правой (карточка + история);
+.grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; }
+.grid > .rz-list { flex: 1 1 560px; min-width: 320px; }
+.grid > .stack { flex: 1 1 380px; min-width: 340px; display: flex; flex-direction: column; gap: 16px; }
+/* левая колонка (список) по умолчанию фиксируется по высоте правой (карточка + история);
    при большом числе порталов появляется прокрутка, а не рост высоты */
-.grid > .panel { display: flex; flex-direction: column; min-height: 0; }
+.rz-list > .panel { display: flex; flex-direction: column; min-height: 0; }
+
+/* ── Резайз «окон» перетаскиванием рамок ───────────────────────────── */
+.rz { position: relative; min-width: 0; }
+.rz > .panel { height: 100%; box-sizing: border-box; }
+/* .rz-list без своей высоты — тянется по правой колонке (align-items: stretch),
+   пока пользователь не задаст высоту перетаскиванием нижнего края */
+.rz-history { height: 260px; }
+.rz-log { height: 340px; }
+/* карточка портала: при уменьшении высоты прокручивается внутри себя */
+.rz-detail > .panel { overflow-y: auto; }
+.rz-tip { margin: 14px 0 6px; }
+@media (max-width: 1024px) {
+  /* одна колонка: список получает свою высоту (не может тянуться по соседу) */
+  .grid > .rz-list { flex: 1 1 100% !important; width: auto !important; height: 460px !important; }
+  .grid > .stack { flex: 1 1 100%; }
+}
+
+.rz-handle { position: absolute; z-index: 4; touch-action: none; }
+.rz-e { top: 10px; bottom: 10px; right: -5px; width: 11px; cursor: ew-resize; }
+.rz-s { left: 10px; right: 10px; bottom: -5px; height: 11px; cursor: ns-resize; }
+.rz-se { right: -5px; bottom: -5px; width: 18px; height: 18px; cursor: nwse-resize; z-index: 5; }
+.rz-e::after {
+  content: ''; position: absolute; top: 0; bottom: 0; right: 4px; width: 3px;
+  border-radius: 2px; background: transparent; transition: background 0.12s;
+}
+.rz-s::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 4px; height: 3px;
+  border-radius: 2px; background: transparent; transition: background 0.12s;
+}
+.rz-e:hover::after, .rz-s:hover::after { background: var(--accent); }
+.rz-se::after {
+  content: ''; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px;
+  border-right: 2px solid var(--text-dim); border-bottom: 2px solid var(--text-dim);
+}
+.rz-se:hover::after { border-color: var(--accent); }
+body.rz-dragging { user-select: none; }
+body.rz-dragging .rz-e::after, body.rz-dragging .rz-s::after { background: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  .rz-e::after, .rz-s::after { transition: none; }
+}
 
 .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
 .card {
@@ -224,8 +265,10 @@ table.portals tbody tr.selected { background: #1d2740; outline: 1px solid var(--
 .scrollbox .history-item:last-child,
 .scrollbox .log-item:last-child { border-bottom: none; }
 .resize-y { resize: vertical; min-height: 110px; }
-.history-box { height: 200px; }
-.log-box { height: 300px; }
+/* история портала и журнал: наполняют свою (резайзящуюся рамкой) панель */
+.rz-history > .panel, .rz-log > .panel { display: flex; flex-direction: column; min-height: 0; }
+.history-box, .log-box { flex: 1 1 0; min-height: 0; }
+/* «внимание в первую очередь» остаётся с собственным резайзом за угол */
 .attention-box { height: 150px; margin: 0; padding-left: 34px; list-style-position: outside; }
 .attention-item { margin: 5px 0; }
 

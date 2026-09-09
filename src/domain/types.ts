@@ -9,6 +9,7 @@ export type ActionType =
   | 'stabilize'
   | 'close'
   | 'send_observer'
+  | 'evacuate'
   | 'mark_review'
   | 'clear_review';
 

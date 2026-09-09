@@ -3,7 +3,14 @@ import { computeRisk, recommendedAction, RISK_WEIGHTS } from '../domain/risk';
 import type { ActionType, Portal } from '../domain/types';
 import { fmtMinutes, riskClass, riskText, STATUS_LABEL } from './format';
 
-const ACTION_ORDER: ActionType[] = ['stabilize', 'send_observer', 'mark_review', 'clear_review', 'close'];
+const ACTION_ORDER: ActionType[] = [
+  'stabilize',
+  'send_observer',
+  'evacuate',
+  'mark_review',
+  'clear_review',
+  'close',
+];
 
 export function PortalDetail({
   portal,
@@ -114,6 +121,7 @@ export function PortalDetail({
         {ACTION_ORDER.map((action) => {
           if (action === 'clear_review' && portal.status !== 'under_review') return null;
           if (action === 'mark_review' && portal.status === 'under_review') return null;
+          if (action === 'evacuate' && portal.creaturesInside === 0) return null;
           const guard = canRun(action, portal);
           const blocked = guard.ok === false;
           const needsConfirm = guard.ok === true && !!guard.confirm;
@@ -121,7 +129,7 @@ export function PortalDetail({
             'btn small' +
             (action === 'close' ? ' danger' : '') +
             (blocked || needsConfirm ? ' guarded' : '') +
-            (action === 'stabilize' && !blocked ? ' primary' : '');
+            ((action === 'stabilize' || action === 'evacuate') && !blocked ? ' primary' : '');
           return (
             <div key={action}>
               <button

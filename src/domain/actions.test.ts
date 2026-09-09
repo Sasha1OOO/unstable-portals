@@ -56,6 +56,12 @@ describe('canRun — невозможные состояния', () => {
     expect(canRun('send_observer', { ...open, hasObserver: true })).toMatchObject({ ok: false });
   });
 
+  it('отозвать существ можно только когда они есть и портал открыт', () => {
+    expect(canRun('evacuate', open).ok).toBe(false); // 0 существ
+    expect(canRun('evacuate', { ...closed, creaturesInside: 3 }).ok).toBe(false); // закрыт
+    expect(canRun('evacuate', { ...open, creaturesInside: 3 })).toEqual({ ok: true });
+  });
+
   it('нельзя пометить «под вопросом» закрытый портал и нельзя пометить дважды', () => {
     expect(canRun('mark_review', closed).ok).toBe(false);
     expect(canRun('mark_review', { ...open, status: 'under_review' }).ok).toBe(false);
@@ -89,5 +95,19 @@ describe('applyAction — эффекты', () => {
 
   it('отправка наблюдателя выставляет флаг', () => {
     expect(applyAction('send_observer', open).portal.hasObserver).toBe(true);
+  });
+
+  it('эвакуация обнуляет существ внутри', () => {
+    const { portal, message } = applyAction('evacuate', { ...open, creaturesInside: 5 });
+    expect(portal.creaturesInside).toBe(0);
+    expect(message).toMatch(/было 5/);
+  });
+
+  it('после эвакуации закрытие уже не требует подтверждения', () => {
+    const withCreatures: Portal = { ...open, creaturesInside: 3 };
+    const before = canRun('close', withCreatures);
+    expect(before.ok && before.confirm).toBeTruthy();
+    const evacuated = applyAction('evacuate', withCreatures).portal;
+    expect(canRun('close', evacuated)).toEqual({ ok: true });
   });
 });

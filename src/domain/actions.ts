@@ -21,6 +21,7 @@ export const ACTION_LABEL: Record<ActionType, string> = {
   stabilize: 'Стабилизировать',
   close: 'Закрыть портал',
   send_observer: 'Отправить наблюдателя',
+  evacuate: 'Отозвать существ',
   mark_review: 'Пометить «под вопросом»',
   clear_review: 'Снять «под вопросом»',
 };
@@ -71,6 +72,14 @@ export function canRun(action: ActionType, portal: Portal): GuardResult {
           ok: true,
           confirm: `Риск портала — ${RISK_LABEL[risk.level]}. Отправить наблюдателя на свой страх и риск?`,
         };
+      return { ok: true };
+    }
+
+    case 'evacuate': {
+      if (closed)
+        return { ok: false, hard: true, reason: 'Портал закрыт — существа за ним уже недосягаемы.' };
+      if (portal.creaturesInside === 0)
+        return { ok: false, hard: true, reason: 'Внутри портала никого нет.' };
       return { ok: true };
     }
 
@@ -129,6 +138,12 @@ export function applyAction(
       return {
         portal: { ...portal, hasObserver: true },
         message: 'Наблюдатель отправлен в портал.',
+      };
+
+    case 'evacuate':
+      return {
+        portal: { ...portal, creaturesInside: 0 },
+        message: `Отозваны все существа из портала (было ${creatures(portal.creaturesInside)}).`,
       };
 
     case 'mark_review':

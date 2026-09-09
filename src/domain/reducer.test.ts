@@ -80,6 +80,18 @@ describe('labReducer', () => {
     expect(computeRisk(next.portals[0]).level).toBe('critical');
   });
 
+  it('эвакуация: у портала обнуляются существа, действие попадает в журнал', () => {
+    const next = labReducer(state, { type: 'RUN_ACTION', portalId: 'p-abyss', action: 'evacuate' });
+    expect(next.portals.find((p) => p.id === 'p-abyss')!.creaturesInside).toBe(0);
+    expect(next.log[0].kind).toBe('action');
+    expect(next.log[0].message).toMatch(/отозван/i);
+  });
+
+  it('эвакуация закрытого портала отклоняется', () => {
+    const next = labReducer(state, { type: 'RUN_ACTION', portalId: 'p-sealed', action: 'evacuate' });
+    expect(next.log[0].kind).toBe('blocked');
+  });
+
   it('ADD_RANDOM добавляет валидный портал в начало списка и пишет в журнал', () => {
     const next = labReducer(state, { type: 'ADD_RANDOM' });
     expect(next.portals.length).toBe(state.portals.length + 1);

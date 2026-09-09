@@ -58,7 +58,7 @@ const EXTRA: Item[] = [
   {
     id: 'tests',
     text: 'Автотесты проходят',
-    how: 'npm test → 36 passed (домен: risk / actions / reducer / summary).',
+    how: 'npm test → 40 passed (домен: risk / actions / reducer / summary / text).',
   },
   {
     id: 'build',

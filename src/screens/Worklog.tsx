@@ -115,7 +115,7 @@ export function Worklog() {
           <strong>Я:</strong> определил список обязательных сценариев, проверил их руками в браузере.
         </p>
         <p>
-          <strong>AI:</strong> написал 36 юнит-тестов на домен (risk / actions / reducer / summary),
+          <strong>AI:</strong> написал 40 юнит-тестов на домен (risk / actions / reducer / summary / text),
           починил конфиг (<code>tsc -b</code> без <code>tsconfig.node.json</code> → просто{' '}
           <code>tsc</code>; типизация vitest через тройной слэш-референс), прогнал сборку.
         </p>
@@ -174,7 +174,7 @@ export function Worklog() {
       <h3>Как проверял, что приложение работает</h3>
       <ul>
         <li>
-          <code>npm test</code> — 36 юнит-тестов на домен (формула, override, все запреты, изменение
+          <code>npm test</code> — 40 юнит-тестов на домен (формула, override, все запреты, изменение
           риска после стабилизации, пустой список, порядок журнала).
         </li>
         <li><code>npm run build</code> — сборка проходит, типы чистые.</li>

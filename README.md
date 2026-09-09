@@ -9,8 +9,8 @@
 Стек: **Vite + React 18 + TypeScript**, тесты — **Vitest**. Состояние хранится в
 памяти (без бэкенда), секретов в коде нет.
 
-**Живая версия:** https://claude.ai/code/artifact/f2b7e35e-6777-4bfe-be62-551fc2a2a325
-(та же сборка, что и `dist/index.html`).
+**Живая версия:** https://sasha1ooo.github.io/unstable-portals/
+(деплой GitHub Pages из этой же ветки, `npm run build`).
 
 ---
 

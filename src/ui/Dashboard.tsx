@@ -152,8 +152,8 @@ export function Dashboard() {
 
       <p className="hint rz-tip">
         Раскладку можно перекраивать за полосы-разделители: между колонками — ширина; между карточкой
-        портала и историей — как поделить высоту; нижний край правой колонки — её общая высота (список
-        подстраивается); нижний край журнала — высота журнала. Двойной клик по полосе — сброс.
+        портала и историей — как поделить высоту; нижний край списка или правой колонки — их общая
+        высота; нижний край журнала — высота журнала. Двойной клик по полосе — сброс.
       </p>
 
       <div
@@ -166,6 +166,12 @@ export function Dashboard() {
             <h2>Порталы ({state.portals.length})</h2>
             <PortalTable portals={state.portals} selectedId={selectedId} onSelect={setSelectedId} />
           </div>
+          <span
+            className="rz-handle rz-s rz-list-s"
+            onPointerDown={startRightH}
+            onDoubleClick={rightH.reset}
+            title="Потяните за нижний край, чтобы изменить высоту (общую для списка и правой колонки). Двойной клик — сброс."
+          />
         </div>
 
         <div

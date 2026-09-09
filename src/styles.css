@@ -140,7 +140,7 @@ button.btn.small { padding: 4px 9px; font-size: 12px; }
   .rz-detail > .panel { overflow-y: visible; }
   .rz-history { flex: none !important; height: 240px; }
   .rz-list { height: 460px !important; }
-  .col-split, .rz-split, .rz-stack-s { display: none; }
+  .col-split, .rz-split, .rz-stack-s, .rz-list-s { display: none; }
 }
 
 /* ── Полосы движения (резайз) ──────────────────────────────────────── */

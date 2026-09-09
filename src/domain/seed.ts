@@ -81,6 +81,48 @@ export function criticalPortal(id = `p-crit-${Date.now()}`): Portal {
   });
 }
 
+const RANDOM_ADJ = [
+  'Багровый', 'Хрустальный', 'Шёпотный', 'Ржавый', 'Лунный', 'Пепельный', 'Тёрновый',
+  'Смолистый', 'Пламенный', 'Полуночный', 'Соляной', 'Грозовой', 'Тихий', 'Мшистый', 'Янтарный',
+];
+const RANDOM_NOUN = ['проём', 'разлом', 'створ', 'зев', 'свищ', 'контур', 'переход', 'прокол', 'рубеж'];
+const RANDOM_WORLD = [
+  'Лес Тихого Света', 'Пустоши Кальдеры', 'Небесный Разлом', 'Мгла Нижних Ярусов',
+  'Стеклянная Пустыня', 'Луговина Мирного Дня', 'Ядро Обугленного Мира', 'Архипелаг Дрейфующих Скал',
+  'Подземелья Сырого Камня', 'Терраса Вечного Заката', 'Соляные Дюны', 'Гулкие Катакомбы',
+];
+
+const pick = <T,>(a: readonly T[], rng: () => number) => a[Math.floor(rng() * a.length)];
+const int = (min: number, max: number, rng: () => number) =>
+  min + Math.floor(rng() * (max - min + 1));
+
+/**
+ * Случайный портал со всеми валидными полями. Уровень риска получается любым —
+ * это нормально: смотритель сам решает, что с ним делать.
+ * @param rng — источник случайности (по умолчанию Math.random), можно подменить в тестах.
+ */
+export function randomPortal(id = `p-rnd-${Date.now()}`, rng: () => number = Math.random): Portal {
+  const status = rng() < 0.85 ? 'open' : 'under_review';
+  return {
+    id,
+    name: `${pick(RANDOM_ADJ, rng)} ${pick(RANDOM_NOUN, rng)}`,
+    destinationWorld: pick(RANDOM_WORLD, rng),
+    energy: int(5, 100, rng),
+    stability: int(3, 98, rng),
+    minutesToCollapse: int(4, 600, rng),
+    creaturesInside: rng() < 0.45 ? 0 : int(1, 8, rng),
+    status,
+    hasObserver: rng() < 0.15,
+    history: [
+      {
+        id: `${id}-h0`,
+        at: new Date().toISOString(),
+        message: 'Портал обнаружен сканером и взят на контроль.',
+      },
+    ],
+  };
+}
+
 function mk(p: Omit<Portal, 'hasObserver' | 'history'> & Partial<Pick<Portal, 'hasObserver'>>): Portal {
   return {
     hasObserver: false,

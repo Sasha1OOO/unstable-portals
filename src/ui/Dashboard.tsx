@@ -138,6 +138,9 @@ export function Dashboard() {
           <button className="btn guarded" onClick={() => dispatch({ type: 'ADD_CRITICAL' })}>
             + Портал с критическим риском
           </button>
+          <button className="btn" onClick={() => dispatch({ type: 'ADD_RANDOM' })}>
+            + Случайный портал
+          </button>
           <button className="btn" onClick={() => dispatch({ type: 'RESET' })}>
             Сброс к началу смены
           </button>

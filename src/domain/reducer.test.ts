@@ -79,4 +79,15 @@ describe('labReducer', () => {
     expect(next.portals.length).toBe(state.portals.length + 1);
     expect(computeRisk(next.portals[0]).level).toBe('critical');
   });
+
+  it('ADD_RANDOM добавляет валидный портал в начало списка и пишет в журнал', () => {
+    const next = labReducer(state, { type: 'ADD_RANDOM' });
+    expect(next.portals.length).toBe(state.portals.length + 1);
+    const p = next.portals[0];
+    expect(p.energy).toBeGreaterThanOrEqual(0);
+    expect(p.energy).toBeLessThanOrEqual(100);
+    expect(p.stability).toBeLessThanOrEqual(100);
+    expect(next.log[0].kind).toBe('system');
+    expect(next.log[0].message).toMatch(/сканер/i);
+  });
 });

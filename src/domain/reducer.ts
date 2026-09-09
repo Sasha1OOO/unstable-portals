@@ -1,6 +1,6 @@
 import { applyAction, canRun } from './actions';
 import { computeRisk } from './risk';
-import { criticalPortal, seedPortals } from './seed';
+import { criticalPortal, randomPortal, seedPortals } from './seed';
 import type { ActionType, LogEntry, Portal, PortalHistoryEntry } from './types';
 
 export interface LabState {
@@ -13,6 +13,7 @@ export type LabEvent =
   | { type: 'LOAD_SEED' }
   | { type: 'LOAD_EMPTY' }
   | { type: 'ADD_CRITICAL' }
+  | { type: 'ADD_RANDOM' }
   | { type: 'RESET' };
 
 let counter = 0;
@@ -69,6 +70,23 @@ export function labReducer(state: LabState, event: LabEvent): LabState {
         portals: [portal, ...state.portals],
         log: [
           log({ portalId: portal.id, portalName: portal.name, kind: 'system', message: 'Зарегистрирован новый портал с критическим риском.' }),
+          ...state.log,
+        ],
+      };
+    }
+
+    case 'ADD_RANDOM': {
+      const portal = randomPortal(id('p-rnd'));
+      const risk = computeRisk(portal);
+      return {
+        portals: [portal, ...state.portals],
+        log: [
+          log({
+            portalId: portal.id,
+            portalName: portal.name,
+            kind: 'system',
+            message: `Сканер обнаружил новый портал (риск: ${risk.level}).`,
+          }),
           ...state.log,
         ],
       };

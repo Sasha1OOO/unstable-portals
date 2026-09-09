@@ -12,7 +12,8 @@ export function Worklog() {
       <ul>
         <li>
           <strong>Claude Code (модель Sonnet 5)</strong> в десктоп-приложении Claude — генерация кода,
-          тестов, README и этого worklog, запуск сборки и тестов.
+          тестов, README и этого worklog, запуск сборки и тестов, публикация живой версии как
+          Claude Artifact.
         </li>
         <li>Локально: Node 25, Vite 5, Vitest 2, TypeScript 5, React 18.</li>
         <li>Git — история коммитов по этапам.</li>

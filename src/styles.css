@@ -101,8 +101,11 @@ button.btn.guarded { border-color: var(--warn); color: var(--warn); }
 button.btn.danger { border-color: var(--danger); color: #fecdd3; }
 button.btn.small { padding: 4px 9px; font-size: 12px; }
 
-.grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); gap: 16px; align-items: start; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); gap: 16px; align-items: stretch; }
 @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+/* левая колонка (список) фиксируется по высоте правой (карточка + история);
+   при большом числе порталов появляется прокрутка, а не рост высоты */
+.grid > .panel { display: flex; flex-direction: column; min-height: 0; }
 
 .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
 .card {
@@ -116,8 +119,22 @@ button.btn.small { padding: 4px 9px; font-size: 12px; }
 .card.alarm { border-color: var(--risk-critical); }
 .card.alarm .n { color: var(--risk-critical); }
 
-.portals-wrap { overflow-x: auto; }
+.portals-wrap {
+  overflow: auto;
+  flex: 1 1 0;
+  min-height: 160px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
 table.portals { width: 100%; border-collapse: collapse; table-layout: fixed; }
+table.portals thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-panel);
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 var(--border);
+}
 table.portals col.c-name { width: 17%; }
 table.portals col.c-world { width: 17%; }
 table.portals col.c-energy,
@@ -196,7 +213,24 @@ table.portals tbody tr.selected { background: #1d2740; outline: 1px solid var(--
 .log-item.action .k { color: var(--ok); }
 .log-item.blocked .k { color: var(--danger); }
 
-.log-list, .history-list { max-height: 320px; overflow: auto; }
+/* Резайзящиеся прокручиваемые блоки: журнал, история портала */
+.scrollbox {
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0c1220;
+  padding: 2px 12px;
+}
+.scrollbox .history-item:last-child,
+.scrollbox .log-item:last-child { border-bottom: none; }
+.resize-y { resize: vertical; min-height: 110px; }
+.history-box { height: 200px; }
+.log-box { height: 300px; }
+.attention-box { height: 150px; margin: 0; padding-left: 34px; list-style-position: outside; }
+.attention-item { margin: 5px 0; }
+
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack > .panel + .panel { margin-top: 0; }
 
 .empty { text-align: center; color: var(--text-dim); padding: 40px 20px; }
 .empty .big { font-size: 15px; color: var(--text); margin-bottom: 6px; }

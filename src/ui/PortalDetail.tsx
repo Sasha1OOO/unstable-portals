@@ -1,7 +1,7 @@
 import { ACTION_LABEL, canRun } from '../domain/actions';
 import { computeRisk, recommendedAction, RISK_WEIGHTS } from '../domain/risk';
 import type { ActionType, Portal } from '../domain/types';
-import { fmtMinutes, fmtTime, riskClass, riskText, STATUS_LABEL } from './format';
+import { fmtMinutes, riskClass, riskText, STATUS_LABEL } from './format';
 
 const ACTION_ORDER: ActionType[] = ['stabilize', 'send_observer', 'mark_review', 'clear_review', 'close'];
 
@@ -140,25 +140,6 @@ export function PortalDetail({
       <p className="hint">
         🔒 — действие запрещено (нелогичное состояние), при попытке фиксируется в журнале. ⚠ — нужно подтверждение.
       </p>
-
-      <h3>История изменений портала</h3>
-      <div className="history-list">
-        {portal.history.map((h) => (
-          <div className="history-item" key={h.id}>
-            <time>{fmtTime(h.at)}</time>
-            <span>
-              {h.message}
-              {h.riskBefore && h.riskAfter && h.riskBefore !== h.riskAfter && (
-                <>
-                  {' '}
-                  <span className={riskClass(h.riskBefore)}>{riskText(h.riskBefore)}</span> →{' '}
-                  <span className={riskClass(h.riskAfter)}>{riskText(h.riskAfter)}</span>
-                </>
-              )}
-            </span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

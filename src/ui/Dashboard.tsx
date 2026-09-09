@@ -4,6 +4,7 @@ import type { ActionType, Portal } from '../domain/types';
 import { useLab } from '../state/store';
 import { EventLog } from './EventLog';
 import { PortalDetail } from './PortalDetail';
+import { PortalHistory } from './PortalHistory';
 import { PortalTable } from './PortalTable';
 import { SummaryBar } from './SummaryBar';
 
@@ -94,7 +95,10 @@ export function Dashboard() {
           <h2>Порталы ({state.portals.length})</h2>
           <PortalTable portals={state.portals} selectedId={selectedId} onSelect={setSelectedId} />
         </div>
-        <PortalDetail portal={selected} onAttempt={attempt} />
+        <div className="stack">
+          <PortalDetail portal={selected} onAttempt={attempt} />
+          <PortalHistory portal={selected} />
+        </div>
       </div>
 
       <EventLog log={state.log} />

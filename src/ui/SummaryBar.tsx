@@ -41,21 +41,24 @@ export function SummaryBar({
         </div>
       </div>
 
-      <h3>Внимание в первую очередь</h3>
+      <h3>Внимание в первую очередь ({s.attention.length})</h3>
       {s.attention.length === 0 ? (
         <p className="hint">Порталов со средним и выше риском нет — можно выдохнуть.</p>
       ) : (
-        <ol style={{ margin: 0, paddingLeft: 18 }}>
-          {s.attention.map((a) => (
-            <li key={a.portal.id} style={{ margin: '4px 0' }}>
-              <button className="btn small" onClick={() => onPick(a.portal.id)}>
-                {a.portal.name}
-              </button>{' '}
-              <span className={riskClass(a.level)}>{riskText(a.level)}</span>{' '}
-              <span className="hint">{a.reason}</span>
-            </li>
-          ))}
-        </ol>
+        <>
+          <ol className="scrollbox resize-y attention-box">
+            {s.attention.map((a) => (
+              <li key={a.portal.id} className="attention-item">
+                <button className="btn small" onClick={() => onPick(a.portal.id)}>
+                  {a.portal.name}
+                </button>{' '}
+                <span className={riskClass(a.level)}>{riskText(a.level)}</span>{' '}
+                <span className="hint">{a.reason}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="hint">Потяните за нижний край списка, чтобы изменить его высоту.</p>
+        </>
       )}
     </div>
   );

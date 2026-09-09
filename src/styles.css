@@ -140,30 +140,26 @@ button.btn.small { padding: 4px 9px; font-size: 12px; }
   .rz-detail > .panel { overflow-y: visible; }
   .rz-history { flex: none !important; height: 240px; }
   .rz-list { height: 460px !important; }
-  .col-grip, .rz-split, .rz-stack-s { display: none; }
+  .col-split, .rz-split, .rz-stack-s { display: none; }
 }
 
 /* ── Полосы движения (резайз) ──────────────────────────────────────── */
-.rz-handle, .col-grip, .rz-split { touch-action: none; z-index: 6; }
-.rz-handle::after, .col-grip::after, .rz-split::after {
+.rz-handle, .col-split, .rz-split { touch-action: none; z-index: 6; }
+.rz-handle::after, .col-split::after, .rz-split::after {
   content: ''; position: absolute; border-radius: 2px;
   background: rgba(148, 163, 184, 0.30); transition: background 0.12s;
 }
-.rz-handle:hover::after, .col-grip:hover::after, .rz-split:hover::after,
-body.rz-dragging .rz-handle::after, body.rz-dragging .col-grip::after,
+.rz-handle:hover::after, .col-split:hover::after, .rz-split:hover::after,
+body.rz-dragging .rz-handle::after, body.rz-dragging .col-split::after,
 body.rz-dragging .rz-split::after { background: var(--accent); }
 
 /* нижний край панели / правой колонки */
 .rz-handle.rz-s, .rz-stack-s { position: absolute; left: 12px; right: 12px; bottom: -6px; height: 12px; cursor: ns-resize; }
 .rz-handle.rz-s::after, .rz-stack-s::after { left: 0; right: 0; bottom: 4px; height: 3px; }
 
-/* граница колонок: правый край списка и левый край карточки/истории — одно и то же */
-.col-grip { position: absolute; top: 12px; bottom: 12px; width: 14px; cursor: ew-resize; }
-.col-grip-e { right: -8px; }
-.col-grip-w { left: -8px; }
-.col-grip::after { top: 0; bottom: 0; width: 3px; }
-.col-grip-e::after { right: 5px; }
-.col-grip-w::after { left: 5px; }
+/* одна общая полоса на границе списка и правой колонки (список + история) */
+.col-split { position: absolute; left: -8px; top: 0; bottom: 0; width: 16px; cursor: ew-resize; z-index: 7; }
+.col-split::after { top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 3px; }
 
 /* одна полоса между карточкой и историей — делит высоту */
 .rz-split { flex: 0 0 16px; position: relative; cursor: ns-resize; }
@@ -171,7 +167,7 @@ body.rz-dragging .rz-split::after { background: var(--accent); }
 
 body.rz-dragging { user-select: none; }
 @media (prefers-reduced-motion: reduce) {
-  .rz-handle::after, .col-grip::after, .rz-split::after { transition: none; }
+  .rz-handle::after, .col-split::after, .rz-split::after { transition: none; }
 }
 
 .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }

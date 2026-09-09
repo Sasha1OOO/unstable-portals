@@ -166,12 +166,6 @@ export function Dashboard() {
             <h2>Порталы ({state.portals.length})</h2>
             <PortalTable portals={state.portals} selectedId={selectedId} onSelect={setSelectedId} />
           </div>
-          <span
-            className="col-grip col-grip-e"
-            onPointerDown={startCol}
-            onDoubleClick={col.reset}
-            title={colTitle}
-          />
         </div>
 
         <div
@@ -179,18 +173,20 @@ export function Dashboard() {
           ref={stackRef}
           style={rightH.value != null ? { height: rightH.value } : undefined}
         >
+          {/* одна общая полоса на границе списка и правой колонки */}
+          <span
+            className="col-split"
+            onPointerDown={startCol}
+            onDoubleClick={col.reset}
+            title={colTitle}
+          />
+
           <div
             className="rz rz-detail"
             ref={detailRef}
             style={split.value != null ? { flex: `0 0 ${split.value}px` } : undefined}
           >
             <PortalDetail portal={selected} onAttempt={attempt} />
-            <span
-              className="col-grip col-grip-w"
-              onPointerDown={startCol}
-              onDoubleClick={col.reset}
-              title={colTitle}
-            />
           </div>
 
           <span
@@ -202,12 +198,6 @@ export function Dashboard() {
 
           <div className="rz rz-history">
             <PortalHistory portal={selected} />
-            <span
-              className="col-grip col-grip-w"
-              onPointerDown={startCol}
-              onDoubleClick={col.reset}
-              title={colTitle}
-            />
           </div>
 
           <span
